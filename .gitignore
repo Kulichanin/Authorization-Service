@@ -31,5 +31,5 @@ go.work.sum
 # .idea/
 # .vscode/
 
-config/*.yaml
-config/*.yml
+config/prod.yaml
+config/prod.yml

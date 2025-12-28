@@ -1,0 +1,12 @@
+env: "dev"
+storage_path: "./storage/sso.db"
+grpc:
+  port: 44044
+  host: "localhost"
+database:
+  host: "localhost"
+  port: 5432
+  user: "user"
+  password: "user"
+  dbname: "test"
+  sslmode: false

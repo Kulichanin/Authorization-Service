@@ -1,8 +1,9 @@
 package config
 
 import (
-	"fmt"
+	"flag"
 	"log"
+	"os"
 
 	"github.com/spf13/viper"
 )
@@ -25,33 +26,7 @@ type DataBaseConfig struct {
 	User     string `mapstructure:"user"`
 	Password string `mapstructure:"password"`
 	DBName   string `mapstructure:"dbname"`
-	SSLMode  string `mapstructure:"sslmode"`
-}
-
-var AppConfig *Config
-
-func Init(pathConfig string) error {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-
-	// Добавляем пути поиска конфига
-	viper.AddConfigPath(pathConfig)
-
-	// Настройка дефолтных значений
-	setDefaults()
-
-	if err := viper.ReadConfig(); err != nil {
-		log.Printf("Warning: config file not found, using defaults and environment variables: %v", err)
-	}
-
-	// Привязка конфига к структуре
-	AppConfig = &Config{}
-	if err := viper.Unmarshal(AppConfig); err != nil {
-		return fmt.Errorf("failed to unmarshal config: %w", err)
-	}
-
-	log.Printf("Config loaded successfully from: %s", viper.ConfigFileUsed())
-	return nil
+	SSLMode  bool   `mapstructure:"sslmode"`
 }
 
 func setDefaults() {
@@ -64,4 +39,49 @@ func setDefaults() {
 	viper.SetDefault("database.host", "localhost")
 	viper.SetDefault("database.port", "5432")
 	viper.SetDefault("database.sslmode", "disable")
+}
+
+func MustLoad() *Config {
+	var AppConfig *Config
+
+	path := FetchConfigPath()
+	if path == "" {
+		panic("config path is empty")
+	}
+	viper.SetConfigType("yaml")
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		panic("config file does not exist:" + path)
+	}
+
+	// Добавляем пути поиска конфига
+	viper.AddConfigPath(path)
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Printf("Warning: config file not found, using defaults and environment variables: %v", err)
+	}
+
+	setDefaults()
+
+	// Привязка конфига к структуре
+	AppConfig = &Config{}
+	if err := viper.Unmarshal(AppConfig); err != nil {
+		panic("failed to unmarshal config: ")
+	}
+
+	log.Printf("Config loaded successfully from: %s", viper.ConfigFileUsed())
+	return AppConfig
+}
+
+func FetchConfigPath() string {
+	var res string
+
+	flag.StringVar(&res, "config", "", "path to config")
+	flag.Parse()
+
+	if res != "" {
+		res = os.Getenv("CONFIG_PATH")
+	}
+
+	return res
 }
