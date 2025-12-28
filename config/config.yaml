@@ -1,2 +1,0 @@
-env: "dev" # dev, prod
-storage_path: "./storage/sso.db"
