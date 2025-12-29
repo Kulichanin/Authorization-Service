@@ -44,18 +44,20 @@ func setDefaults() {
 func MustLoad() *Config {
 	var AppConfig *Config
 
+	// Получаем полный путь
 	path := FetchConfigPath()
 	if path == "" {
 		panic("config path is empty")
 	}
 	viper.SetConfigType("yaml")
 
+	// Проверяем есть ли конфиг файл
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		panic("config file does not exist:" + path)
 	}
 
-	// Добавляем пути поиска конфига
-	viper.AddConfigPath(path)
+	// Указываем полный путь напрямую
+	viper.SetConfigFile(path)
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Printf("Warning: config file not found, using defaults and environment variables: %v", err)
@@ -69,7 +71,6 @@ func MustLoad() *Config {
 		panic("failed to unmarshal config: ")
 	}
 
-	log.Printf("Config loaded successfully from: %s", viper.ConfigFileUsed())
 	return AppConfig
 }
 
@@ -79,7 +80,7 @@ func FetchConfigPath() string {
 	flag.StringVar(&res, "config", "", "path to config")
 	flag.Parse()
 
-	if res != "" {
+	if res == "" {
 		res = os.Getenv("CONFIG_PATH")
 	}
 

@@ -6,8 +6,8 @@ option go_package = "kdv.sso.v1;ssov1";
 
 service Auth {
   rpc Register (RegisterRequest) returns (RegisterResponse);
-  rpc Login (LoginRequest) returns (LoginReponse);
-  rpc IsAdmin (IsAdminRequest) returns (IsAdminResonse);
+  rpc Login (LoginRequest) returns (LoginResponse);
+  rpc IsAdmin (IsAdminRequest) returns (IsAdminResponse);
 }
 
 message RegisterRequest {
@@ -25,7 +25,7 @@ message LoginRequest {
     int32 app_id = 3; // ID of the app to login to.
 }
 
-message LoginReponse {
+message LoginResponse {
     string token = 1; // Auth token of the logged in user.
 }
 
@@ -33,6 +33,6 @@ message IsAdminRequest {
     int64 user_id = 1; // User ID to validate.
 }
 
-message IsAdminResonse {
+message IsAdminResponse {
     bool is_admin = 1; // Indicate whether the user is in admin.
 }
